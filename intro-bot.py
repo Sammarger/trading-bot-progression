@@ -38,3 +38,4 @@ class SwimmingGreenTapir(QCAlgorithm):
             self.liquidate(self.spy) # Liquidates all positions in portfolio
             self.Log("SELL SPY @" + str(price))
             self.nextEntryTime = self.Time + self.period
+ 
