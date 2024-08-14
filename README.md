@@ -1,3 +1,4 @@
+
 # Samuel Margerison - Algorithmic Trading Bots
 
 This project documents my journey in learning about the QuantConnect API and it's features.
@@ -6,11 +7,11 @@ This project documents my journey in learning about the QuantConnect API and it'
 -   [Intro Bot Build](#introductory-bot-build)
 -   [Trailing Stop Loss Build](#trailing-stop-loss-build)
 -   [Uptrend-Downtrend Detector Build](#uptrend-and-downtrend-detector-build)
+-   [Intra-Day Trading Build](#intra-day-trading-build)
 
 ## Introductory Bot Build
 
 The `intro-bot` buys SPY when not already invested and the current time meets or exceeds a predefined entry time, calculating the number of shares to purchase based on available cash and current price. It sells SPY if the current price is either 10% above or 10% below the entry price, resetting the next entry time after selling. The algorithm operates from February 3, 2023, to February 3, 2024, with an initial cash allocation of $100,000, using Interactive Brokers as the brokerage model under a margin account.
-
 ![alt text](screenshots/intro-bot-graph.png)
 
 ## Trailing Stop Loss Build
@@ -58,3 +59,27 @@ Key points include:
 ### Benchmark Graph
 
 ![alt text](screenshots/uptrend-downtrend-benchmark-graph.png)
+
+## Intra-day Trading Build
+
+ It focuses on trading the SPY ETF (SPDR S&P 500 ETF Trust), adjusting its holdings based on the opening price relative to the closing price of the previous day.
+
+Key components and behaviors of the algorithm include:
+
+### Initialization
+ The algorithm sets its operational parameters during initialization, specifying the start and end dates, initial cash amount, and the symbol for the SPY ETF. It also configures a rolling window to hold the last two daily bars of trade data for the SPY ETF and schedules a task to liquidate positions 15 minutes before the market closes every day.
+
+### Trading Logic
+ The core trading logic is implemented in the on_data method. This method checks if the rolling window is ready with enough data. It then ensures that trading actions only occur exactly at 9:31 AM, right after the market opens. Based on the comparison of the current day's opening price against the closing price of the previous day stored in the rolling window, the algorithm decides whether to increase or decrease its holdings in SPY. Specifically, it buys if the opening price is at least 1% lower than the previous day's closing price and sells if the opening price is at least 1% higher.
+
+### Custom Bar Handler
+ The CustomBarHandler method is defined to add new bars to the rolling window as they become available. This method is crucial for maintaining the rolling window with the latest data, which is essential for the algorithm's decision-making process.
+
+### Exiting Positions
+ The ExitPositions method is scheduled to run 15 minutes before the market closes every day, instructing the algorithm to liquidate its position in SPY. This ensures that the algorithm does not hold positions overnight, adhering to a strategy of exiting the market before the close.
+
+![alt text](screenshots/intra-day-strategy-equity.png)
+
+### Orders
+
+![alt text](screenshots/intra-day-orders.png)
